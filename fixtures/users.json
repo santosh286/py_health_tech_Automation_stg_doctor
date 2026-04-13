@@ -1,0 +1,9 @@
+{
+  "users": [
+    { "email": "sindhu@kapiva.in", "password": "s", "name": "sindhu" },
+    { "email": "rishi@kapiva.in", "password": "r", "name": "rishi" },
+    { "email": "santosh.kumbar@kapiva.in", "password": "s", "name": "santosh", "profileId": "6e0156f2-c6a0-4fef-b00e-b239b8456372", "appointmentId": "86979202-24c1-4aef-a494-d6a5a1da92ce" },
+    { "email": "manjula@kapiva.in", "password": "m", "name": "manjula" },
+    { "email": "nandini@kapiva.in", "password": "n", "name": "nandini" }
+  ]
+}

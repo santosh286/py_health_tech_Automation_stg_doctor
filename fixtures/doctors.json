@@ -1,0 +1,7 @@
+{
+  "sindhu":  { "email": "sindhu@kapiva.in",           "password": "s" },
+  "rishi":   { "email": "rishi@kapiva.in",             "password": "r" },
+  "santosh": { "email": "santosh.kumbar@kapiva.in",    "password": "s" },
+  "manjula": { "email": "manjula@kapiva.in",           "password": "m" },
+  "nandini": { "email": "nandini@kapiva.in",           "password": "n" }
+}

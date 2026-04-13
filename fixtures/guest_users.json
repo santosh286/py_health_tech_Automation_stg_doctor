@@ -1,0 +1,136 @@
+{
+  "guest_users": [
+    {
+      "phone": "9722248450",
+      "email": "testuser1774722248450@kapiva.test",
+      "name": "Test User8450",
+      "createdAt": "2026-03-28T18:26:13.110Z"
+    },
+    {
+      "phone": "9726065755",
+      "email": "testuser1774726065755@kapiva.test",
+      "name": "Test User5755",
+      "createdAt": "2026-03-28T19:30:00.398Z"
+    },
+    {
+      "phone": "9800386059",
+      "email": "testuser1774800386059@kapiva.test",
+      "name": "Test User6059",
+      "createdAt": "2026-03-29T16:08:43.014Z"
+    },
+    {
+      "phone": "9800613925",
+      "email": "testuser1774800613925@kapiva.test",
+      "name": "Test User3925",
+      "createdAt": "2026-03-29T16:12:42.637Z"
+    },
+    {
+      "phone": "9804392644",
+      "email": "testuser1774804392644@kapiva.test",
+      "name": "Test User2644",
+      "createdAt": "2026-03-29T17:15:40.435Z"
+    },
+    {
+      "phone": "9807793776",
+      "email": "testuser1774807793776@kapiva.test",
+      "name": "Test User3776",
+      "createdAt": "2026-03-29T18:12:12.413Z"
+    },
+    {
+      "phone": "9807955579",
+      "email": "testuser1774807955579@kapiva.test",
+      "name": "Test User5579",
+      "createdAt": "2026-03-29T18:14:48.960Z"
+    },
+    {
+      "phone": "9856212881",
+      "email": "testuser1774856212881@kapiva.test",
+      "name": "Test User2881",
+      "createdAt": "2026-03-30T07:39:23.858Z"
+    },
+    {
+      "phone": "9861924705",
+      "email": "testuser1774861924705@kapiva.test",
+      "name": "Test User4705",
+      "createdAt": "2026-03-30T09:14:23.075Z"
+    },
+    {
+      "phone": "9862682767",
+      "email": "testuser1774862682767@kapiva.test",
+      "name": "Test User2767",
+      "createdAt": "2026-03-30T09:27:05.557Z"
+    },
+    {
+      "phone": "9871695190",
+      "email": "testuser1774871695190@kapiva.test",
+      "name": "Test User5190",
+      "createdAt": "2026-03-30T11:57:13.184Z"
+    },
+    {
+      "phone": "9878663862",
+      "email": "testuser1774878663862@kapiva.test",
+      "name": "Test User3862",
+      "createdAt": "2026-03-30T13:53:23.517Z"
+    },
+    {
+      "phone": "9939122815",
+      "email": "testuser1774939122815@kapiva.test",
+      "name": "Test User2815",
+      "createdAt": "2026-03-31T06:41:04.164Z"
+    },
+    {
+      "phone": "9132886612",
+      "email": "testuser1775132886612@kapiva.test",
+      "name": "Test User6612",
+      "createdAt": "2026-04-02T12:30:26.783Z"
+    },
+    {
+      "phone": "9191520673",
+      "email": "testuser1775191520673@kapiva.test",
+      "name": "Test User0673",
+      "createdAt": "2026-04-03T04:47:37.419Z"
+    },
+    {
+      "phone": "9562031496",
+      "email": "testuser1775562031496@kapiva.test",
+      "name": "Test User1496",
+      "createdAt": "2026-04-07T11:42:51.156Z"
+    },
+    {
+      "phone": "9629464174",
+      "email": "testuser1775629464174@kapiva.test",
+      "name": "Test User4174",
+      "createdAt": "2026-04-08T06:26:39.590Z"
+    },
+    {
+      "phone": "9630597877",
+      "email": "testuser1775630597877@kapiva.test",
+      "name": "Test User7877",
+      "createdAt": "2026-04-08T06:45:36.568Z"
+    },
+    {
+      "phone": "9631881770",
+      "email": "testuser1775631881770@kapiva.test",
+      "name": "Test User1770",
+      "createdAt": "2026-04-08T07:06:58.430Z"
+    },
+    {
+      "phone": "9632046948",
+      "email": "testuser1775632046948@kapiva.test",
+      "name": "Test User6948",
+      "createdAt": "2026-04-08T07:09:39.367Z"
+    },
+    {
+      "phone": "9715323902",
+      "email": "testuser1775715323902@kapiva.test",
+      "name": "Test User3902",
+      "createdAt": "2026-04-09T06:17:44.050Z"
+    },
+    {
+      "phone": "9718934321",
+      "email": "testuser1775718934321@kapiva.test",
+      "name": "Test User4321",
+      "createdAt": "2026-04-09T07:17:56.350Z"
+    }
+  ]
+}
