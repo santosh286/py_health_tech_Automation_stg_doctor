@@ -131,6 +131,12 @@
       "email": "testuser1775718934321@kapiva.test",
       "name": "Test User4321",
       "createdAt": "2026-04-09T07:17:56.350Z"
+    },
+    {
+      "phone": "9139747740",
+      "email": "testuser1776139747740@kapiva.test",
+      "name": "Test User7740",
+      "createdAt": "2026-04-14T04:11:28.484Z"
     }
   ]
 }

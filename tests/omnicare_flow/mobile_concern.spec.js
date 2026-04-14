@@ -19,252 +19,195 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
-    test.setTimeout(300000); // 5 min — includes 2x 1-min waits for payment steps
+  test.setTimeout(300000); // 5 min
 
   // ============================================================
-  // ⚙️ UNIQUE TEST DATA — increments on every run via timestamp
+  // STEP 1 — Generate unique test data
   // ============================================================
   const ts = Date.now();
-  let phone = `9${ts.toString().slice(-9)}`;  // 10-digit starting with 9
+  let phone = `9${ts.toString().slice(-9)}`;
   let email = `testuser${ts}@kapiva.test`;
   let name  = `Test User${ts.toString().slice(-4)}`;
-  console.log(`🔑 Generated → phone: ${phone} | email: ${email} | name: ${name}`);
+  console.log(`[STEP 1] ✅ Generated → phone: ${phone} | email: ${email} | name: ${name}`);
 
   // ============================================================
-  // 🌐 OPEN WEBSITE
+  // STEP 2 — Open staging.kapiva.in
   // ============================================================
   await page.goto('https://staging.kapiva.in/');
-  console.log('🌐 Guest user landed on homepage');
+  console.log('[STEP 2] ✅ Guest user landed on homepage');
 
   // ============================================================
-  // 🚫 CLOSE STAGING POPUP IF VISIBLE
+  // STEP 3 — Dismiss staging popup
   // ============================================================
   await page.evaluate(() => {
     if (typeof window.hideStagingPopup === 'function') window.hideStagingPopup();
   });
-  console.log('🚫 Staging popup dismissed (if present)');
+  console.log('[STEP 3] ✅ Staging popup dismissed (if present)');
 
   // ============================================================
-  // ✅ VERIFY SELECT CONCERN SECTION
+  // STEP 4 — Verify SELECT CONCERN section visible
   // ============================================================
   const concernLabel = page.getByText('SELECT CONCERN:');
   await expect(concernLabel).toBeVisible({ timeout: 10000 });
-  console.log('📌 SELECT CONCERN section visible');
+  console.log('[STEP 4] ✅ SELECT CONCERN section visible');
 
   // ============================================================
-  // 🧪 CLICK "Blood Sugar & Chronic Care" CONCERN
-  // Uses .relative.mb-5.lg:mb-10 container which holds all concern items
+  // STEP 5 — Click "Blood Sugar & Chronic Care" concern
   // ============================================================
   const concernSection = page.locator('.relative.mb-5.lg\\:mb-10');
   await expect(concernSection).toBeVisible({ timeout: 10000 });
-
   const concernItem = concernSection.getByText('Blood Sugar & Chronic Care').first();
   await expect(concernItem).toBeVisible({ timeout: 10000 });
-
   await concernItem.click();
-  console.log('🧪 Clicking concern: Blood Sugar & Chronic Care');
+  console.log('[STEP 5] ✅ Clicked concern: Blood Sugar & Chronic Care');
 
   // ============================================================
-  // ✅ ASSERT SELECTED CONCERN LABEL (mb-5 flex items-center justify-start lg:mb-10)
+  // STEP 6 — Verify selected concern label
   // ============================================================
   const selectedConcernLabel = page.locator('.mb-5.flex.items-center.justify-start.lg\\:mb-10');
   await expect(selectedConcernLabel).toBeVisible({ timeout: 10000 });
-
   const labelText = await selectedConcernLabel.innerText();
-  console.log(`✅ Selected concern label: "${labelText}"`);
   expect(labelText, '❌ Selected concern label mismatch').toContain('Blood Sugar & Chronic Care');
+  console.log(`[STEP 6] ✅ Selected concern label: "${labelText}"`);
 
   // ============================================================
-  // 🔗 CLICK "VIEW ALL" TO NAVIGATE TO SOLUTION PAGE
+  // STEP 7 — Click "View All Blood Sugar" → navigate to /solution/ page
   // ============================================================
   const viewAll = page.getByRole('link', { name: /View all Blood Sugar/i });
   await expect(viewAll).toBeVisible({ timeout: 10000 });
-
-  console.log('🧪 Clicking: View all Blood Sugar & Chronic Care');
   await Promise.all([
     page.waitForURL(url => url.pathname !== '/', { timeout: 15000 }),
     viewAll.click()
   ]);
-
-  const finalUrl = page.url();
-  console.log(`✅ Navigated to: ${finalUrl}`);
-
-  expect(finalUrl, '❌ Did not navigate to solution page').toContain('/solution/');
-
-  // ============================================================
-  // ✅ VERIFY PAGE CONTENT
-  // ============================================================
+  const solutionUrl = page.url();
+  expect(solutionUrl, '❌ Did not navigate to solution page').toContain('/solution/');
   await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
-  console.log('✅ Blood Sugar & Chronic Care solution page loaded');
+  console.log(`[STEP 7] ✅ Navigated to solution page: ${solutionUrl}`);
 
   // ============================================================
-  // 🛒 LOOP PRODUCTS — find "Dia Free Juice" and click Add to Cart
-  // Uses lg:mx-[90px] container which wraps the product grid
+  // STEP 8 — Loop products → find "Dia Free Juice - Blood Sugar Management"
   // ============================================================
   const productGrid = page.locator('.lg\\:mx-\\[90px\\]');
   await expect(productGrid).toBeVisible({ timeout: 10000 });
-
   const products = productGrid.locator('article');
   const productCount = await products.count();
-  console.log(`📦 Products found: ${productCount}`);
+  console.log(`[STEP 8] 📦 Products found: ${productCount}`);
 
   let found = false;
-
   for (let i = 0; i < productCount; i++) {
     const product = products.nth(i);
     const title = await product.locator('h2').innerText().catch(() => '');
-
     console.log(`  [${i + 1}] ${title}`);
 
     if (title.includes('Dia Free Juice - Blood Sugar Management')) {
-      console.log(`✅ Found target product: "${title}"`);
-
-      // Add to Cart is the first button in the product card (cart icon, no text label)
-      // Structure: generic > button[cart icon] + button[BUY NOW]
-      const addToCart = product.locator('button').first();
-      await expect(addToCart).toBeVisible({ timeout: 10000 });
-      await addToCart.click();
-
-      console.log('🛒 Add to Cart clicked for: Dia Free Juice - Blood Sugar Management');
-      await page.waitForTimeout(1000);
+      console.log(`[STEP 8] ✅ Found target product: "${title}"`);
 
       // ============================================================
-      // 🖱 CLICK PRODUCT CARD — navigate to product detail page
+      // STEP 9 — Click product link → navigate to PDP
       // ============================================================
       const productLink = product.locator('a').first();
       await expect(productLink).toBeVisible({ timeout: 10000 });
-
       await Promise.all([
         page.waitForURL(url => url.pathname !== page.url(), { timeout: 15000 }).catch(() => {}),
         productLink.click()
       ]);
-
       const productUrl = page.url();
-      console.log(`🔗 Navigated to product page: ${productUrl}`);
       await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
-      console.log('✅ Product detail page loaded');
+      console.log(`[STEP 9] ✅ Navigated to PDP: ${productUrl}`);
 
       found = true;
       break;
     }
   }
-
   expect(found, '❌ Product "Dia Free Juice - Blood Sugar Management" not found in grid').toBe(true);
 
-  
-
-
+  // ============================================================
+  // STEP 10 — Wait for "Select a Pack" section
+  // ============================================================
+  await expect(page.getByText('Select a Pack')).toBeVisible({ timeout: 10000 });
+  console.log('[STEP 10] ✅ "Select a Pack" section visible');
 
   // ============================================================
-  // 🛒 CLICK CART ICON — [class="lg:size-[20px]"]
+  // STEP 11 — Click first AOV pack
   // ============================================================
-  const cartBtn = page.locator('[class="lg:size-[20px]"]');
-  await expect(cartBtn).toBeVisible({ timeout: 10000 });
-  await cartBtn.click({ force: true });
-  console.log('🛒 Cart icon clicked');
+  // First pack inside the AOV scroll container
+  const firstPack = page.locator('[class="no-scrollbar ml-[-24px] flex gap-[16px] overflow-x-scroll px-[24px]"] > *').first();
+  await expect(firstPack, '❌ First AOV pack not found').toBeVisible({ timeout: 10000 });
+  await firstPack.click();
+  await page.waitForTimeout(500);
+  console.log('[STEP 11] ✅ First AOV pack selected');
+
+  // ============================================================
+  // STEP 12 — Click BUY NOW
+  // ============================================================
+  const buyNowBtn = page.getByRole('button', { name: /buy now/i });
+  await expect(buyNowBtn, '❌ BUY NOW button not visible').toBeVisible({ timeout: 10000 });
+  await buyNowBtn.click();
   await page.waitForTimeout(2000);
+  console.log('[STEP 12] ✅ BUY NOW clicked');
 
   // ============================================================
-  // ✅ WAIT FOR CART DRAWER TO OPEN — then assert product + checkout
-  // ============================================================
-  const checkout = page.getByRole('button', { name: 'CHECKOUT' });
-  await expect(checkout, '❌ Cart drawer did not open — CHECKOUT not visible').toBeVisible({ timeout: 15000 });
-  console.log('✅ Cart drawer open');
-
-  // Find visible product text in cart drawer (page also has hidden product name behind overlay)
-  const allMatches = await page.getByText('Dia Free Juice - Blood Sugar Management').all();
-  let productInCart = false;
-  for (const el of allMatches) {
-    if (await el.isVisible().catch(() => false)) {
-      const cardText = await el.innerText().catch(() => '');
-      console.log(`📦 Product in cart: "${cardText}"`);
-      productInCart = true;
-      break;
-    }
-  }
-  expect(productInCart, '❌ Product not visible in cart').toBe(true);
-  console.log('✅ Product card visible with: Dia Free Juice - Blood Sugar Management');
-
-  const detailsSection = page.locator('.h-full > div:nth-child(2)').first();
-  const isDetailVisible = await detailsSection.isVisible().catch(() => false);
-  if (isDetailVisible) {
-    const detailsText = await detailsSection.innerText();
-    console.log(`📋 Details section text:\n${detailsText}`);
-    console.log('✅ Details section visible and has content');
-  }
-
-  // ============================================================
-  // 📜 SCROLL DOWN + CLICK CHECKOUT
-  // ============================================================
-  await page.evaluate(() => window.scrollBy(0, 300));
-  console.log('📜 Scrolled down');
-  await checkout.click();
-  console.log('✅ CHECKOUT clicked');
-
-  // ============================================================
-  // 🌐 WAIT FOR CHECKOUT PAGE
+  // STEP 13 — Wait for checkout page URL
   // ============================================================
   await page.waitForURL(url => url.pathname.includes('checkout'), { timeout: 15000 });
   await page.setViewportSize({ width: 412, height: 810 });
-  console.log('✅ On checkout page');
+  console.log(`[STEP 13] ✅ On checkout page: ${page.url()}`);
 
   // ============================================================
-  // 📞 ENTER PHONE NUMBER FIRST
+  // STEP 14 — Enter phone number
   // ============================================================
   const phoneInput = page.getByRole('textbox', { name: /phone/i });
   await expect(phoneInput).toBeVisible({ timeout: 10000 });
   await phoneInput.fill(phone);
-  console.log(`📞 Phone entered: ${phone}`);
   await page.waitForTimeout(2000);
+  console.log(`[STEP 14] ✅ Phone entered: ${phone}`);
 
   // ============================================================
-  // 🏠 FILL SHIPPING ADDRESS — address1 + postalCode
+  // STEP 15 — Fill address (street + pincode)
   // ============================================================
   const address1Input = page.locator('[name="address1"]');
   await expect(address1Input).toBeVisible({ timeout: 10000 });
   await address1Input.fill('123, MG Road, Indiranagar');
-  console.log('🏠 Address filled: 123, MG Road, Indiranagar');
+  console.log('[STEP 15] ✅ Address filled: 123, MG Road, Indiranagar');
 
   const postalCodeInput = page.locator('[name="postalCode"]');
   await expect(postalCodeInput).toBeVisible({ timeout: 10000 });
   await postalCodeInput.fill('560001');
-  console.log('📮 Pincode filled: 560001');
-
-  // Wait for city/state to auto-populate from pincode
   await page.waitForTimeout(1500);
+  console.log('[STEP 15] ✅ Pincode filled: 560001 (waiting for city/state auto-populate)');
 
   // ============================================================
-  // 📧 FILL EMAIL + NAME
+  // STEP 16 — Fill email and name
   // ============================================================
   const emailInput = page.getByRole('textbox', { name: /email/i });
   await expect(emailInput).toBeVisible({ timeout: 10000 });
   await emailInput.fill(email);
-  console.log(`📧 Email: ${email}`);
+  console.log(`[STEP 16] ✅ Email: ${email}`);
 
   const nameInput = page.getByRole('textbox', { name: /full name/i });
   await expect(nameInput).toBeVisible({ timeout: 10000 });
   await nameInput.clear();
   await nameInput.fill(name);
-  console.log(`👤 Name: ${name}`);
+  console.log(`[STEP 16] ✅ Name: ${name}`);
 
-  // ✅ Re-check phone — site may reset it after other fields fill
+  // ============================================================
+  // STEP 17 — Re-check phone (site may reset it)
+  // ============================================================
   const currentPhone = await phoneInput.inputValue();
   if (currentPhone !== phone) {
-    console.log(`⚠️ Phone was cleared (got: "${currentPhone}"), re-filling...`);
+    console.log(`[STEP 17] ⚠️ Phone was cleared (got: "${currentPhone}"), re-filling...`);
     await phoneInput.fill(phone);
     await page.waitForTimeout(1000);
-    console.log(`📞 Phone re-filled: ${phone}`);
+    console.log(`[STEP 17] ✅ Phone re-filled: ${phone}`);
   } else {
-    console.log(`✅ Phone still intact: ${currentPhone}`);
+    console.log(`[STEP 17] ✅ Phone still intact: ${currentPhone}`);
   }
 
   // ============================================================
-  // 💳 SCROLL + CLICK PAY SECURELY (sticky footer button)
+  // STEP 18 — Scroll → click PAY SECURELY
   // ============================================================
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(500);
-
-  // PAY SECURELY — try button role first, fall back to any element with text
   let payBtn = page.getByRole('button', { name: /pay securely/i });
   const payBtnVisible = await payBtn.isVisible().catch(() => false);
   if (!payBtnVisible) {
@@ -273,72 +216,42 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   await expect(payBtn, '❌ PAY SECURELY button not visible').toBeVisible({ timeout: 15000 });
   await payBtn.scrollIntoViewIfNeeded();
   await payBtn.click({ force: true });
-  console.log('💳 PAY SECURELY clicked');
+  console.log('[STEP 18] ✅ PAY SECURELY clicked');
 
   // ============================================================
-  // 🔘 WAIT FOR PAYMENT SECTION [id="80000141"] + CLICK RADIO
+  // STEP 19 — Wait for payment section [id="80000141"] → click radio
   // ============================================================
   const paymentSection = page.locator('[id="80000141"]');
   await expect(paymentSection, '❌ Payment section #80000141 not visible').toBeVisible({ timeout: 30000 });
   await paymentSection.scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
-  console.log('✅ Payment section #80000141 visible');
-
-  // Try native radio input first, fall back to clicking the section itself
   const radioBtn = paymentSection.locator('input[type="radio"]').first();
   const isRadioVisible = await radioBtn.isVisible().catch(() => false);
   if (isRadioVisible) {
     await radioBtn.click({ force: true });
-    console.log('🔘 Radio button clicked in #80000141');
+    console.log('[STEP 19] ✅ Radio button clicked in #80000141');
   } else {
     await paymentSection.click({ force: true });
-    console.log('🔘 Payment section #80000141 clicked (no radio input found)');
+    console.log('[STEP 19] ✅ Payment section #80000141 clicked (no radio input found)');
   }
 
   // ============================================================
-  // 📜 SCROLL + CLICK "Proceed to Pay"
+  // STEP 20 — Scroll → click Proceed to Pay
   // ============================================================
   await page.evaluate(() => window.scrollBy(0, 300));
   await page.waitForTimeout(500);
-
   const proceedBtn = page.getByRole('button', { name: /proceed to pay/i });
   await expect(proceedBtn, '❌ Proceed to Pay button not visible').toBeVisible({ timeout: 15000 });
   await proceedBtn.click({ force: true });
-  console.log('✅ Proceed to Pay clicked');
-
-  // // ============================================================
-  // // 🖱 CLICK [id="80000134"] INSIDE PAYMENT IFRAME — wait 1 min
-  // // ============================================================
-  // // Wait for Razorpay payment iframe to load after "Proceed to Pay"
-  // await page.waitForSelector('iframe[src*="razorpay"]', { timeout: 30000 });
-  // const payFrame = page.frameLocator('iframe[src*="razorpay"]');
-
-  // const elem134 = payFrame.locator('[id="80000133"]');
-  // await expect(elem134, '❌ Element #80000133 not visible in iframe').toBeVisible({ timeout: 30000 });
-  // await elem134.click({ force: true });
-  // console.log('✅ Clicked #80000133 inside iframe');
-  // await page.waitForTimeout(60000);
-  // console.log('✅ Waited 1 min after #80000133');
-
-  // // ============================================================
-  // // 🖱 CLICK [id="80000181"] INSIDE PAYMENT IFRAME — wait 1 min
-  // // ============================================================
-  // const elem181 = payFrame.locator('[id="80000181"]');
-  // await expect(elem181, '❌ Element #80000181 not visible in iframe').toBeVisible({ timeout: 30000 });
-  // await elem181.click({ force: true });
-  // console.log('✅ Clicked #80000181 inside iframe');
-  // await page.waitForTimeout(60000);
-  // console.log('✅ Waited 1 min after #80000181');
+  console.log('[STEP 20] ✅ Proceed to Pay clicked');
 
   // ============================================================
-  // 🪟 WAIT FOR MODAL + SELECT "CHARGED" + SUBMIT
+  // STEP 21 — Wait for modal → open txnStateDropdownToggle
   // ============================================================
-  // Wait for .modal-content to be visible
   const modalContent = page.locator('.modal-content').first();
   await expect(modalContent, '❌ .modal-content not visible').toBeVisible({ timeout: 30000 });
-  console.log('✅ .modal-content visible');
+  console.log('[STEP 21] ✅ Payment modal visible');
 
-  // 🔽 Open txnStateDropdownToggle — search across all frames
   let targetFrame = page.mainFrame();
   for (const frame of page.frames()) {
     try {
@@ -350,59 +263,62 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   const dropdownToggle = targetFrame.locator('[id="txnStateDropdownToggle"]');
   await expect(dropdownToggle, '❌ txnStateDropdownToggle not visible').toBeVisible({ timeout: 15000 });
   await dropdownToggle.click();
-  console.log('🔽 txnStateDropdownToggle opened');
   await page.waitForTimeout(500);
+  console.log('[STEP 21] ✅ txnStateDropdownToggle opened');
 
-  // ✅ Select CHARGED
+  // ============================================================
+  // STEP 22 — Select "CHARGED" → click Submit
+  // ============================================================
   const chargedOption = targetFrame.getByText('CHARGED', { exact: true }).last();
   await expect(chargedOption, '❌ CHARGED option not visible').toBeVisible({ timeout: 10000 });
   await chargedOption.click();
-  console.log('✅ Selected "CHARGED"');
+  console.log('[STEP 22] ✅ Selected "CHARGED"');
 
-  // 🚀 Click Submit
   const submitBtn = targetFrame.locator('[id="submitButton"]');
   await expect(submitBtn, '❌ submitButton not visible').toBeVisible({ timeout: 10000 });
   await submitBtn.click();
-  console.log('✅ submitButton clicked');
+  console.log('[STEP 22] ✅ Submit clicked');
 
   // ============================================================
-  // ✅ CONFIRM BOOKING — wait for button + click + wait 1 min
+  // STEP 23 — Handle "Something Went Wrong" → click Try Again if visible
   // ============================================================
-  // If "Something Went Wrong!" appears, click "Try Again" inside that card to recover
   const errorCard = page.locator('[class="mt-[12px] flex min-h-[180px] w-full min-w-0 flex-col items-center overflow-hidden rounded-[12px] p-[16px]"]');
   const somethingWrongVisible = await errorCard.isVisible().catch(() => false);
   if (somethingWrongVisible) {
-    console.log('⚠️ "Something Went Wrong!" card visible — clicking "Try Again"');
+    console.log('[STEP 23] ⚠️ "Something Went Wrong!" visible — clicking Try Again');
     const tryAgainBtn = errorCard.getByRole('button', { name: /try again/i });
-    await expect(tryAgainBtn, '❌ Try Again button not found inside error card').toBeVisible({ timeout: 10000 });
+    await expect(tryAgainBtn, '❌ Try Again button not found').toBeVisible({ timeout: 10000 });
     await tryAgainBtn.click();
-    console.log('🔄 "Try Again" clicked — waiting for Confirm Booking...');
     await page.waitForTimeout(2000);
+    console.log('[STEP 23] ✅ Try Again clicked');
+  } else {
+    console.log('[STEP 23] ✅ No error — proceeding to Confirm Booking');
   }
 
+  // ============================================================
+  // STEP 24 — Click Confirm Booking → wait 1 min
+  // ============================================================
   const confirmBtn = page.getByRole('button', { name: /confirm booking/i });
   await expect(confirmBtn, '❌ Confirm Booking button not visible').toBeVisible({ timeout: 30000 });
   await confirmBtn.click();
-  console.log('✅ Confirm Booking clicked');
+  console.log('[STEP 24] ✅ Confirm Booking clicked — waiting 1 min...');
   await page.waitForTimeout(60000);
-  console.log('✅ Waited 1 min after Confirm Booking');
+  console.log('[STEP 24] ✅ 1 min wait complete');
 
   // ============================================================
-  // 👨‍⚕️ EXTRACT DOCTOR NAME + BOOKING TIME
+  // STEP 25 — Extract doctor name + booking time
   // ============================================================
   const bookingCard = page.locator('.flex.min-h-0.w-full.flex-1.flex-col').first();
   await expect(bookingCard, '❌ Booking card not visible').toBeVisible({ timeout: 15000 });
-
   const bookingText = await bookingCard.innerText();
-  console.log(`📋 Booking details:\n${bookingText}`);
+  console.log(`[STEP 25] 📋 Booking details:\n${bookingText}`);
 
-  // ⏸ PAUSE — wait 5s at end to observe result
   // ============================================================
-  console.log('⏸ Waiting 3 seconds before test ends...');
+  // STEP 26 — Wait 20s → save phone to fixtures/guest_users.json
+  // ============================================================
+  console.log('[STEP 26] ⏸ Waiting 20s before saving...');
   await page.waitForTimeout(20000);
-  // ============================================================
-  // 💾 SAVE PHONE TO fixtures/guest_users.json
-  // ============================================================
+
   const fixturePath = path.resolve('fixtures/guest_users.json');
   const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
   fixtureData.guest_users.push({
@@ -412,8 +328,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
     createdAt: new Date().toISOString(),
   });
   fs.writeFileSync(fixturePath, JSON.stringify(fixtureData, null, 2));
-  console.log(`💾 Saved to fixtures/guest_users.json → phone: ${phone}`);
+  console.log(`[STEP 26] ✅ Saved to fixtures/guest_users.json → phone: ${phone}`);
 
-  console.log('✅ Test complete');
-
+  console.log('🎉 Test complete');
 });
