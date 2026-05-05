@@ -6,7 +6,17 @@
     "test": "npx playwright test",
     "allure:generate": "npx allure generate allure-results --clean -o allure-report",
     "allure:open": "npx allure open allure-report",
-    "allure:report": "npm run allure:generate && npm run allure:open"
+    "allure:report": "npm run allure:generate && npm run allure:open",
+    "test:auth": "npx playwright test tests/auth/",
+    "test:appointments": "npx playwright test tests/appointments/",
+    "test:dashboard": "npx playwright test tests/dashboard/",
+    "test:booking": "npx playwright test tests/booking/",
+    "test:capacity": "npx playwright test tests/capacity/",
+    "test:navigation": "npx playwright test tests/navigation/",
+    "test:doctors-list": "npx playwright test tests/doctors-list/",
+    "test:access-control": "npx playwright test tests/access-control/",
+    "test:help": "npx playwright test tests/help/",
+    "test:my-profile": "npx playwright test tests/my-profile/"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +26,7 @@
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.5.0",
     "allure-commandline": "^2.38.1",
-    "allure-playwright": "^3.6.0"
+    "allure-playwright": "^2.15.1",
+    "dotenv": "^17.4.2"
   }
 }

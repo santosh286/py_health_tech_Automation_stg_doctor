@@ -1,13 +1,7 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
-
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+import path from 'path';
+const allurePlaywrightPath = path.join(process.cwd(), 'node_modules', 'allure-playwright', 'dist', 'index.js');
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -28,10 +22,20 @@ export default defineConfig({
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
-    ['allure-playwright', {
+    [allurePlaywrightPath, {
       detail: true,
       outputFolder: 'allure-results',
       suiteTitle: true,
+      environmentInfo: {
+        Environment:        'Staging',
+        Base_URL:           'https://stg-hts.kapiva.tech/',
+        Browser:            'Chromium',
+        Framework:          'Playwright',
+        Playwright_Version: '1.58.2',
+        Node_Version:       process.version,
+        OS:                 process.platform,
+        Headless:           'true',
+      },
     }],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
