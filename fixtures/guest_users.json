@@ -227,6 +227,18 @@
       "email": "testuser1777962963241@kapiva.test",
       "name": "Test User3241",
       "createdAt": "2026-05-05T06:38:35.564Z"
+    },
+    {
+      "phone": "9973742607",
+      "email": "testuser1777973742607@kapiva.test",
+      "name": "Test User2607",
+      "createdAt": "2026-05-05T09:38:14.234Z"
+    },
+    {
+      "phone": "9974830683",
+      "email": "testuser1777974830683@kapiva.test",
+      "name": "Test User0683",
+      "createdAt": "2026-05-05T09:56:26.660Z"
     }
   ]
 }
