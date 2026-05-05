@@ -16,6 +16,15 @@ test.afterEach(async ({ page }, testInfo) => {
     console.log(`📸 Screenshot saved: ${screenshotPath}`);
     await testInfo.attach('failure-screenshot', { path: screenshotPath, contentType: 'image/png' }).catch(() => {});
   }
+  // Clear cookies, localStorage, sessionStorage, and close browser
+  await page.context().clearCookies().catch(() => {});
+  await page.evaluate(() => {
+    try { localStorage.clear(); } catch {}
+    try { sessionStorage.clear(); } catch {}
+  }).catch(() => {});
+  await page.context().clearPermissions().catch(() => {});
+  await page.close().catch(() => {});
+  console.log('🧹 Cookies, localStorage, sessionStorage cleared — browser closed');
 });
 
 test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
@@ -154,16 +163,69 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   console.log(`[STEP 13] ✅ On checkout page: ${page.url()}`);
 
   // ============================================================
-  // STEP 14 — Enter phone number
+  // STEP 14 — Handle Shiprocket widget (if visible) then enter phone
   // ============================================================
+
+  // Check if Shiprocket widget is showing
+  const shiprocketWidget = page.locator('text=Verify your number to proceed').first();
+  const shiprocketVisible = await shiprocketWidget.isVisible({ timeout: 5000 }).catch(() => false);
+
+  if (shiprocketVisible) {
+    console.log('[STEP 14] ⚠️ Shiprocket widget detected — running OTP flow');
+
+    // 14a — Enter phone into Shiprocket widget
+    const srPhoneInput = page.locator('input[placeholder="Phone No."]').first();
+    await expect(srPhoneInput, '❌ Shiprocket phone input not found').toBeVisible({ timeout: 10000 });
+    await srPhoneInput.fill(phone);
+    await page.waitForTimeout(1000);
+    console.log(`[STEP 14] ✅ Phone entered: ${phone}`);
+
+    // 14b — Wait for Send OTP to be enabled, then click
+    const sendOtpBtn = page.locator('button[aria-label="Send OTP"]').first();
+    await expect(sendOtpBtn, '❌ Send OTP button not found').toBeVisible({ timeout: 10000 });
+    await expect(sendOtpBtn, '❌ Send OTP button still disabled').toBeEnabled({ timeout: 10000 });
+    await sendOtpBtn.click({ force: true });
+    await page.waitForTimeout(2000);
+    console.log('[STEP 14] ✅ Send OTP clicked');
+
+    // 14c — Fill 999999 into 6 OTP boxes
+    const firstOtpBox = page.locator('input[id="sr-otp-0"]');
+    await expect(firstOtpBox, '❌ OTP boxes not visible').toBeVisible({ timeout: 15000 });
+    for (let i = 0; i < 6; i++) {
+      await page.locator(`input[id="sr-otp-${i}"]`).fill('9');
+      await page.waitForTimeout(200);
+    }
+    console.log('[STEP 14] ✅ OTP entered: 999999');
+
+    // 14d — Click arrow 3 more times
+    for (let i = 1; i <= 3; i++) {
+      const arrowBtn = page.locator('button[aria-label="Verify OTP"], button[aria-label="Send OTP"]').first();
+      await expect(arrowBtn, `❌ Arrow not found on click ${i}`).toBeVisible({ timeout: 10000 });
+      await arrowBtn.click({ force: true });
+      await page.waitForTimeout(1000);
+      console.log(`[STEP 14] ✅ Arrow clicked (${i}/3)`);
+    }
+
+    // 14e — Wait for normal form
+    await expect(
+      page.locator('[name="address1"]').first(),
+      '❌ Normal form did not appear after Shiprocket flow'
+    ).toBeVisible({ timeout: 15000 });
+    console.log('[STEP 14] ✅ Normal form visible after Shiprocket');
+
+  } else {
+    console.log('[STEP 14] ✅ No Shiprocket widget — normal form already visible');
+  }
+
+  // Enter phone into normal form phone field
   const phoneInput = page.getByRole('textbox', { name: /phone/i });
   await expect(phoneInput).toBeVisible({ timeout: 10000 });
   await phoneInput.fill(phone);
-  await page.waitForTimeout(2000);
-  console.log(`[STEP 14] ✅ Phone entered: ${phone}`);
+  await page.waitForTimeout(500);
+  console.log(`[STEP 14] ✅ Phone entered in normal form: ${phone}`);
 
   // ============================================================
-  // STEP 15 — Fill address (street + pincode)
+  // STEP 15 — Fill address, pincode, email, name → Save Changes
   // ============================================================
   const address1Input = page.locator('[name="address1"]');
   await expect(address1Input).toBeVisible({ timeout: 10000 });
@@ -174,33 +236,39 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   await expect(postalCodeInput).toBeVisible({ timeout: 10000 });
   await postalCodeInput.fill('560001');
   await page.waitForTimeout(1500);
-  console.log('[STEP 15] ✅ Pincode filled: 560001 (waiting for city/state auto-populate)');
+  console.log('[STEP 15] ✅ Pincode filled: 560001');
 
-  // ============================================================
-  // STEP 16 — Fill email and name
-  // ============================================================
   const emailInput = page.getByRole('textbox', { name: /email/i });
   await expect(emailInput).toBeVisible({ timeout: 10000 });
   await emailInput.fill(email);
-  console.log(`[STEP 16] ✅ Email: ${email}`);
+  console.log(`[STEP 15] ✅ Email: ${email}`);
 
   const nameInput = page.getByRole('textbox', { name: /full name/i });
   await expect(nameInput).toBeVisible({ timeout: 10000 });
   await nameInput.clear();
   await nameInput.fill(name);
-  console.log(`[STEP 16] ✅ Name: ${name}`);
+  console.log(`[STEP 15] ✅ Name: ${name}`);
 
-  // ============================================================
-  // STEP 17 — Re-check phone (site may reset it)
-  // ============================================================
+  // Re-check phone — re-fill if site cleared it
   const currentPhone = await phoneInput.inputValue();
   if (currentPhone !== phone) {
-    console.log(`[STEP 17] ⚠️ Phone was cleared (got: "${currentPhone}"), re-filling...`);
+    console.log(`[STEP 15] ⚠️ Phone was cleared, re-filling...`);
     await phoneInput.fill(phone);
+    await page.waitForTimeout(500);
+  }
+  console.log(`[STEP 15] ✅ Phone confirmed: ${phone}`);
+
+  console.log('[STEP 15] ✅ All details filled');
+
+  // Click Save Changes if visible
+  const saveBtn = page.getByRole('button', { name: /save changes/i });
+  const saveBtnVisible = await saveBtn.isVisible({ timeout: 3000 }).catch(() => false);
+  if (saveBtnVisible) {
+    await saveBtn.click({ force: true });
     await page.waitForTimeout(1000);
-    console.log(`[STEP 17] ✅ Phone re-filled: ${phone}`);
+    console.log('[STEP 15] ✅ Save Changes clicked');
   } else {
-    console.log(`[STEP 17] ✅ Phone still intact: ${currentPhone}`);
+    console.log('[STEP 15] ℹ️ Save Changes not visible — skipping');
   }
 
   // ============================================================
@@ -296,14 +364,17 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   }
 
   // ============================================================
-  // STEP 24 — Click Confirm Booking → wait 1 min
+  // STEP 24 — Click Confirm Booking → wait for confirmation page
   // ============================================================
   const confirmBtn = page.getByRole('button', { name: /confirm booking/i });
   await expect(confirmBtn, '❌ Confirm Booking button not visible').toBeVisible({ timeout: 30000 });
-  await confirmBtn.click();
-  console.log('[STEP 24] ✅ Confirm Booking clicked — waiting 1 min...');
-  await page.waitForTimeout(60000);
-  console.log('[STEP 24] ✅ 1 min wait complete');
+  await Promise.all([
+    page.waitForURL(url => url.href !== page.url(), { timeout: 60000 }).catch(() => {}),
+    confirmBtn.click(),
+  ]);
+  console.log('[STEP 24] ✅ Confirm Booking clicked — waiting for confirmation...');
+  await page.waitForTimeout(3000);
+  console.log(`[STEP 24] ✅ After booking URL: ${page.url()}`);
 
   // ============================================================
   // STEP 25 — Extract doctor name + booking time
