@@ -5,7 +5,7 @@ import path from 'path';
 test.use({
   ...devices['Pixel 7'], // 📱 Mobile device
   launchOptions: {
-    slowMo: 1000, // 1s delay between every action
+    slowMo: process.env.CI ? 0 : 1000, // slowMo only locally, not on CI
   },
 });
 
