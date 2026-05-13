@@ -1,8 +1,6 @@
 name: OmniCare Mobile Concern Test
 
 on:
-  schedule:
-    - cron: '30 5 * * *' # 11:00 AM IST (UTC+5:30) = 05:30 UTC
   push:
     branches: [main]
     paths:
