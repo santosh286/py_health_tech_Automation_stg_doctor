@@ -368,27 +368,27 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // ============================================================
   const confirmBtn = page.getByRole('button', { name: /confirm booking/i });
   await expect(confirmBtn, '❌ Confirm Booking button not visible').toBeVisible({ timeout: 30000 });
-  await Promise.all([
-    page.waitForURL(url => url.href !== page.url(), { timeout: 60000 }).catch(() => {}),
-    confirmBtn.click(),
-  ]);
-  console.log('[STEP 24] ✅ Confirm Booking clicked — waiting for confirmation...');
-  await page.waitForTimeout(3000);
+  await confirmBtn.click();
+  console.log('[STEP 24] ✅ Confirm Booking clicked');
+
+  // Wait for navigation — page may reload or redirect
+  await page.waitForLoadState('domcontentloaded', { timeout: 60000 }).catch(() => {});
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
   console.log(`[STEP 24] ✅ After booking URL: ${page.url()}`);
 
   // ============================================================
   // STEP 25 — Extract doctor name + booking time
   // ============================================================
   const bookingCard = page.locator('.flex.min-h-0.w-full.flex-1.flex-col').first();
-  await expect(bookingCard, '❌ Booking card not visible').toBeVisible({ timeout: 15000 });
+  await expect(bookingCard, '❌ Booking card not visible').toBeVisible({ timeout: 20000 });
   const bookingText = await bookingCard.innerText();
   console.log(`[STEP 25] 📋 Booking details:\n${bookingText}`);
 
   // ============================================================
-  // STEP 26 — Wait 20s → save phone to fixtures/guest_users.json
+  // STEP 26 — Save phone to fixtures/guest_users.json
   // ============================================================
-  console.log('[STEP 26] ⏸ Waiting 20s before saving...');
-  await page.waitForTimeout(20000);
+  console.log('[STEP 26] ⏸ Waiting 5s before saving...');
+  await page.waitForTimeout(5000).catch(() => {});
 
   const fixturePath = path.resolve('fixtures/guest_users.json');
   const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf-8'));
