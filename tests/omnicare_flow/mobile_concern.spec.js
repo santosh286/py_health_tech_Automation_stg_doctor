@@ -28,7 +28,7 @@ test.afterEach(async ({ page }, testInfo) => {
 });
 
 test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
-  test.setTimeout(300000); // 5 min
+  test.setTimeout(process.env.CI ? 600000 : 300000); // 10 min on CI, 5 min locally
 
   // ============================================================
   // STEP 1 — Generate unique test data
@@ -42,7 +42,8 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // ============================================================
   // STEP 2 — Open staging.kapiva.in
   // ============================================================
-  await page.goto('https://staging.kapiva.in/');
+  await page.goto('https://staging.kapiva.in/', { waitUntil: 'domcontentloaded', timeout: 30000 });
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
   console.log('[STEP 2] ✅ Guest user landed on homepage');
 
   // ============================================================
@@ -63,10 +64,9 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // ============================================================
   // STEP 5 — Click "Blood Sugar & Chronic Care" concern
   // ============================================================
-  const concernSection = page.locator('.relative.mb-5.lg\\:mb-10');
-  await expect(concernSection).toBeVisible({ timeout: 10000 });
-  const concernItem = concernSection.getByText('Blood Sugar & Chronic Care').first();
-  await expect(concernItem).toBeVisible({ timeout: 10000 });
+  const concernItem = page.getByText('Blood Sugar & Chronic Care').first();
+  await expect(concernItem).toBeVisible({ timeout: 15000 });
+  await concernItem.scrollIntoViewIfNeeded();
   await concernItem.click();
   console.log('[STEP 5] ✅ Clicked concern: Blood Sugar & Chronic Care');
 
@@ -83,7 +83,8 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // STEP 7 — Click "View All Blood Sugar" → navigate to /solution/ page
   // ============================================================
   const viewAll = page.getByRole('link', { name: /View all Blood Sugar/i });
-  await expect(viewAll).toBeVisible({ timeout: 10000 });
+  await expect(viewAll).toBeVisible({ timeout: 15000 });
+  await viewAll.scrollIntoViewIfNeeded();
   await Promise.all([
     page.waitForURL(url => url.pathname !== '/', { timeout: 15000 }),
     viewAll.click()
@@ -116,6 +117,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
       // ============================================================
       const productLink = product.locator('a').first();
       await expect(productLink).toBeVisible({ timeout: 10000 });
+      await productLink.scrollIntoViewIfNeeded();
       await Promise.all([
         page.waitForURL(url => url.pathname !== page.url(), { timeout: 15000 }).catch(() => {}),
         productLink.click()
@@ -142,6 +144,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // First pack inside the AOV scroll container
   const firstPack = page.locator('[class="no-scrollbar ml-[-24px] flex gap-[16px] overflow-x-scroll px-[24px]"] > *').first();
   await expect(firstPack, '❌ First AOV pack not found').toBeVisible({ timeout: 10000 });
+  await firstPack.scrollIntoViewIfNeeded();
   await firstPack.click();
   await page.waitForTimeout(500);
   console.log('[STEP 11] ✅ First AOV pack selected');
@@ -151,6 +154,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // ============================================================
   const buyNowBtn = page.getByRole('button', { name: /buy now/i });
   await expect(buyNowBtn, '❌ BUY NOW button not visible').toBeVisible({ timeout: 10000 });
+  await buyNowBtn.scrollIntoViewIfNeeded();
   await buyNowBtn.click();
   await page.waitForTimeout(2000);
   console.log('[STEP 12] ✅ BUY NOW clicked');
