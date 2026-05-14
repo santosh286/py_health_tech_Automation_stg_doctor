@@ -16,7 +16,12 @@
     "test:doctors-list": "npx playwright test tests/doctors-list/",
     "test:access-control": "npx playwright test tests/access-control/",
     "test:help": "npx playwright test tests/help/",
-    "test:my-profile": "npx playwright test tests/my-profile/"
+    "test:my-profile": "npx playwright test tests/my-profile/",
+    "test:roles": "npx playwright test tests/roles/",
+    "test:teams": "npx playwright test tests/teams/",
+    "test:doctor": "npx playwright test tests/doctor/",
+    "test:kapiva-her": "npx playwright test tests/kapiva_her/",
+    "test:omnicare": "npx playwright test tests/omnicare_flow/"
   },
   "keywords": [],
   "author": "",

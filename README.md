@@ -1,6 +1,6 @@
 # py_health_tech_Automation
 
-Playwright-based end-to-end test automation suite for the Kapiva HealthTech platform, covering **Auth**, **Appointments**, **Booking**, **Capacity**, **Dashboard**, **Doctors List**, **Navigation**, **Access Control**, **Help**, **My Profile**, **Doctor**, and **OmniCare** workflows.
+Playwright-based end-to-end test automation suite for the Kapiva HealthTech platform, covering **Auth**, **Appointments**, **Booking**, **Capacity**, **Dashboard**, **Doctors List**, **Navigation**, **Access Control**, **Help**, **My Profile**, **Roles**, **Teams**, **Doctor**, **Kapiva HER**, and **OmniCare** workflows.
 
 ## Tech Stack
 
@@ -51,6 +51,31 @@ Playwright-based end-to-end test automation suite for the Kapiva HealthTech plat
     │   └── sidebar.spec.ts           # Sidebar navigation
     ├── access-control/
     │   └── access-control.spec.ts    # Role-based access control
+    ├── roles/
+    │   └── roles.spec.js             # 7 tests — roles CRUD & access control
+    ├── teams/
+    │   └── teams.spec.js             # 9 tests — teams CRUD, members & access control
+    ├── kapiva_her/                    # Kapiva HER landing page & booking (JS specs)
+    │   ├── booking_confirmation_details.spec.js
+    │   ├── booking_form_validation.spec.js
+    │   ├── booking_invalid_email.spec.js
+    │   ├── booking_invalid_phone.spec.js
+    │   ├── booking_slot_selection.spec.js
+    │   ├── booking_via_doctor_card.spec.js
+    │   ├── homepage_banner.spec.js
+    │   ├── landing_page_comparison.spec.js
+    │   ├── landing_page_doctors.spec.js
+    │   ├── landing_page_faq.spec.js
+    │   ├── landing_page_hero.spec.js
+    │   ├── landing_page_howitworks.spec.js
+    │   ├── landing_page_no_infertility.spec.js
+    │   ├── landing_page_sticky_cta.spec.js
+    │   ├── landing_page_symptoms.spec.js
+    │   ├── quiz_q13_skip.spec.js
+    │   ├── quiz_without_booking.spec.js
+    │   ├── shantavri_con_booking.spec.js
+    │   ├── shop_now_click.spec.js
+    │   └── utm_attribution.spec.js
     ├── doctor/                        # Original doctor module (JS specs)
     │   ├── authentication.spec.js
     │   ├── call_patient.spec.js
@@ -110,6 +135,11 @@ npm run test:doctors-list
 npm run test:access-control
 npm run test:help
 npm run test:my-profile
+npm run test:roles
+npm run test:teams
+npm run test:doctor
+npm run test:kapiva-her
+npm run test:omnicare
 
 # Run a specific spec file
 npx playwright test tests/auth/auth.spec.ts
@@ -206,6 +236,58 @@ npm run allure:report
 | `reschedule_and_cancel` | Reschedule + cancel combined |
 | `send_reminder` | Patient reminder notifications |
 | `transfer_with_fallback` | Call transfer with fallback |
+
+### Roles (`roles.spec.js`) — 7 tests
+
+| # | Test |
+|---|---|
+| TC_079 | Roles page loads and displays roles list |
+| TC_080 | Non-admin role: /roles page is blocked |
+| TC_081 | Admin can view role details |
+| TC_082 | Create role: API returns success |
+| TC_083 | Update role: API returns success |
+| TC_084 | Delete role: API returns success |
+| TC_085 | Roles page handles API error gracefully |
+| TC_086 | Unauthenticated access to /roles redirects to login |
+
+### Teams (`teams.spec.js`) — 9 tests
+
+| # | Test |
+|---|---|
+| TC_087 | Teams page loads and displays teams list |
+| TC_088 | Non-admin role: /teams page is blocked |
+| TC_089 | Admin can view team details |
+| TC_090 | Create team: API returns success |
+| TC_091 | Update team: API returns success |
+| TC_092 | Delete team: API returns success |
+| TC_093 | Team members list loads correctly |
+| TC_094 | Teams page handles API error gracefully |
+| TC_095 | Unauthenticated access to /teams redirects to login |
+
+### Kapiva HER (`kapiva_her/`) — 20 specs
+
+| Spec | Description |
+|---|---|
+| `landing_page_hero` | Hero section renders correctly |
+| `landing_page_doctors` | Doctors section on landing page |
+| `landing_page_faq` | FAQ section expand/collapse |
+| `landing_page_howitworks` | How it works section |
+| `landing_page_symptoms` | Symptoms section |
+| `landing_page_sticky_cta` | Sticky CTA visibility on scroll |
+| `landing_page_comparison` | Comparison section |
+| `landing_page_no_infertility` | No infertility section |
+| `homepage_banner` | Homepage banner display |
+| `booking_via_doctor_card` | Booking initiated via doctor card |
+| `booking_slot_selection` | Slot selection flow |
+| `booking_form_validation` | Form field validations |
+| `booking_invalid_email` | Invalid email shows error |
+| `booking_invalid_phone` | Invalid phone shows error |
+| `booking_confirmation_details` | Booking confirmation details |
+| `quiz_q13_skip` | Quiz Q13 skip behaviour |
+| `quiz_without_booking` | Quiz flow without booking |
+| `shantavri_con_booking` | Shantavri consultation booking |
+| `shop_now_click` | Shop Now CTA click |
+| `utm_attribution` | UTM parameter attribution |
 
 ### OmniCare Flow (`mobile_concern.spec.js`)
 
