@@ -382,6 +382,159 @@ export function generateDashboardStats(date: Date = new Date()) {
 export const CONSULT_API = "**/consultations-service/api/v1";
 export const PATIENT_API = "**/patients-service/api/v1";
 export const DASHBOARD_API = "https://stg-doctors.kapiva.tech/api";
+export const ROLES_API = "**/api/v1";
+export const TEAMS_API = "**/api/v1";
+
+// ─── Roles ────────────────────────────────────────────────────────────────────
+
+export const MOCK_ROLE = {
+  roleId: "role-001",
+  name: "Admin",
+  key: "admin",
+  active: true,
+  defaultRoute: "/dashboard",
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+  permissions: {
+    features: [
+      { code: "dashboard", frontendRoute: "/dashboard", actions: ["view", "create", "update", "delete"] },
+      { code: "roles", frontendRoute: "/roles", actions: ["view", "create", "update", "delete"] },
+    ],
+  },
+};
+
+export const MOCK_ROLE_2 = {
+  roleId: "role-002",
+  name: "Doctor",
+  key: "doctor",
+  active: true,
+  defaultRoute: "/appointments",
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+  permissions: {
+    features: [
+      { code: "todays_appointments", frontendRoute: "/appointments", actions: ["view"] },
+    ],
+  },
+};
+
+export const MOCK_ROLES_LIST_RESPONSE = {
+  success: true,
+  data: [MOCK_ROLE, MOCK_ROLE_2],
+  pagination: { total: 2, page: 1, limit: 100 },
+};
+
+export const MOCK_ROLE_DETAIL_RESPONSE = {
+  success: true,
+  data: MOCK_ROLE,
+};
+
+export const MOCK_CREATE_ROLE_RESPONSE = {
+  success: true,
+  data: {
+    roleId: "role-003",
+    name: "New Role",
+    key: "new_role",
+    active: true,
+    defaultRoute: "/dashboard",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+};
+
+export const MOCK_UPDATE_ROLE_RESPONSE = {
+  success: true,
+  data: { message: "Role updated successfully." },
+};
+
+export const MOCK_DELETE_ROLE_RESPONSE = {
+  success: true,
+  data: { message: "Role deleted successfully." },
+};
+
+// ─── Teams ────────────────────────────────────────────────────────────────────
+
+export const MOCK_TEAM_MEMBER = {
+  userId: "user-001",
+  firstName: "John",
+  lastName: "Doe",
+  email: "john@kapiva.in",
+  phone: "9000000001",
+  isActive: true,
+  roleId: "role-001",
+  roleName: "Admin",
+};
+
+export const MOCK_TEAM_MEMBER_2 = {
+  userId: "user-002",
+  firstName: "Jane",
+  lastName: "Smith",
+  email: "jane@kapiva.in",
+  phone: "9000000002",
+  isActive: true,
+  roleId: "role-002",
+  roleName: "Doctor",
+};
+
+export const MOCK_TEAM = {
+  teamId: "team-001",
+  name: "Nutrition Team",
+  description: "Handles all nutrition consultations",
+  isActive: true,
+  memberCount: 2,
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+};
+
+export const MOCK_TEAM_2 = {
+  teamId: "team-002",
+  name: "Yoga Team",
+  description: "Handles all yoga sessions",
+  isActive: true,
+  memberCount: 3,
+  createdAt: "2024-01-01T00:00:00.000Z",
+  updatedAt: "2024-01-01T00:00:00.000Z",
+};
+
+export const MOCK_TEAMS_LIST_RESPONSE = {
+  success: true,
+  data: [MOCK_TEAM, MOCK_TEAM_2],
+  pagination: { total: 2, page: 1, limit: 100 },
+};
+
+export const MOCK_TEAM_DETAIL_RESPONSE = {
+  success: true,
+  data: { ...MOCK_TEAM, members: [MOCK_TEAM_MEMBER, MOCK_TEAM_MEMBER_2] },
+};
+
+export const MOCK_TEAM_MEMBERS_RESPONSE = {
+  success: true,
+  data: [MOCK_TEAM_MEMBER, MOCK_TEAM_MEMBER_2],
+  pagination: { total: 2, page: 1, limit: 100 },
+};
+
+export const MOCK_CREATE_TEAM_RESPONSE = {
+  success: true,
+  data: {
+    teamId: "team-003",
+    name: "New Team",
+    description: "A new team",
+    isActive: true,
+    memberCount: 0,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+};
+
+export const MOCK_UPDATE_TEAM_RESPONSE = {
+  success: true,
+  data: { message: "Team updated successfully." },
+};
+
+export const MOCK_DELETE_TEAM_RESPONSE = {
+  success: true,
+  data: { message: "Team deleted successfully." },
+};
 
 // ─── Set Retry ───────────────────────────────────────────────────────────────
 
