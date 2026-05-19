@@ -1,12 +1,48 @@
 import { test, expect, devices } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { applyStealthScripts } from '../helpers/stealth.js';
+
+// Wait for Cloudflare JS challenge to auto-resolve (up to 20s), then fail if still blocked
+async function waitForCloudflare(page, label = '', timeoutMs = 20000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const title = await page.title().catch(() => '');
+    const bodyText = await page.locator('body').innerText({ timeout: 3000 }).catch(() => '');
+    const isChallenge =
+      title.includes('Just a moment') ||
+      bodyText.includes('Performing security verification') ||
+      bodyText.includes('Verify you are human');
+    if (!isChallenge) return; // challenge cleared — proceed
+    console.log(`[Cloudflare] ⏳ Challenge active${label ? ' at ' + label : ''} — waiting...`);
+    await page.waitForTimeout(2000);
+  }
+  throw new Error(`❌ Cloudflare bot challenge not resolved after ${timeoutMs / 1000}s${label ? ' at ' + label : ''}`);
+}
 
 test.use({
   ...devices['Pixel 7'], // 📱 Mobile device
+  channel: 'chrome', // real Chrome — passes Cloudflare bot checks
   launchOptions: {
-    slowMo: process.env.CI ? 0 : 1000, // slowMo only locally, not on CI
+    slowMo: process.env.CI ? 0 : 1000,
+    args: [
+      '--disable-blink-features=AutomationControlled',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-infobars',
+      '--disable-dev-shm-usage',
+    ],
   },
+  userAgent:
+    'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+  extraHTTPHeaders: {
+    'Accept-Language': 'en-US,en;q=0.9',
+  },
+});
+
+// Apply all anti-detection patches before every page load
+test.beforeEach(async ({ page }) => {
+  await applyStealthScripts(page);
 });
 
 test.afterEach(async ({ page }, testInfo) => {
@@ -44,14 +80,42 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   // ============================================================
   await page.goto('https://staging.kapiva.in/', { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+  await waitForCloudflare(page, 'homepage');
   console.log('[STEP 2] ✅ Guest user landed on homepage');
 
   // ============================================================
   // STEP 3 — Dismiss staging popup
   // ============================================================
-  await page.evaluate(() => {
-    if (typeof window.hideStagingPopup === 'function') window.hideStagingPopup();
-  });
+  try {
+    // Try JS function first
+    await page.evaluate(() => {
+      if (typeof window.hideStagingPopup === 'function') window.hideStagingPopup();
+    });
+
+    // Then look for any visible close/dismiss button on overlays/modals
+    const closeSelectors = [
+      'button[aria-label="Close"]',
+      'button[aria-label="close"]',
+      '[data-testid="close-popup"]',
+      '.popup-close',
+      '.modal-close',
+      'button.close',
+      '[class*="close"][class*="modal"]',
+      '[class*="popup"] button',
+      '[class*="overlay"] button',
+    ];
+    for (const sel of closeSelectors) {
+      const btn = page.locator(sel).first();
+      const visible = await btn.isVisible({ timeout: 1500 }).catch(() => false);
+      if (visible) {
+        await btn.click({ force: true });
+        console.log(`[STEP 3] ✅ Closed popup via selector: ${sel}`);
+        break;
+      }
+    }
+  } catch {
+    // Popup handling is best-effort
+  }
   console.log('[STEP 3] ✅ Staging popup dismissed (if present)');
 
   // ============================================================
@@ -91,6 +155,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
   ]);
   const solutionUrl = page.url();
   expect(solutionUrl, '❌ Did not navigate to solution page').toContain('/solution/');
+  await waitForCloudflare(page, 'solution page');
   await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
   console.log(`[STEP 7] ✅ Navigated to solution page: ${solutionUrl}`);
 
@@ -123,6 +188,7 @@ test('Guest User → Select Concern (Omnichannel Flow)', async ({ page }) => {
         productLink.click()
       ]);
       const productUrl = page.url();
+      await waitForCloudflare(page, 'PDP');
       await expect(page.locator('h1, h2').first()).toBeVisible({ timeout: 10000 });
       console.log(`[STEP 9] ✅ Navigated to PDP: ${productUrl}`);
 
