@@ -24,10 +24,10 @@ test('Booking via doctor card — "Consult Now" link leads to booking', async ({
   // STEP 2 — Scroll down to trigger lazy-loaded doctors section
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(2000);
-  const expertsSection = page.locator('h2, h3').filter({ hasText: 'Meet our Ayurvedic Experts' }).first();
-  await expect(expertsSection, '"Meet our Ayurvedic Experts" section not found').toBeVisible({ timeout: 20000 });
+  const expertsSection = page.locator('h2, h3').filter({ hasText: /meet.*expert|meet.*doctor|team.*expert/i }).first();
+  await expect(expertsSection, 'Doctors/experts section not found').toBeVisible({ timeout: 20000 });
   await expertsSection.scrollIntoViewIfNeeded();
-  console.log('[STEP 2] Scrolled to "Meet our Ayurvedic Experts" section');
+  console.log(`[STEP 2] Scrolled to doctors section: "${await expertsSection.innerText()}"`);
 
   // STEP 3 — Find first "Consult Now" link
   const consultNowLinks = page.getByRole('link', { name: /Consult Now/i });

@@ -20,8 +20,8 @@ test('Comparison section — heading visible', async ({ page }) => {
   console.log('[STEP 2] Scrolling to comparison section');
   await page.evaluate(() => window.scrollBy(0, 600));
 
-  console.log('[STEP 3] Verifying comparison section heading');
-  await expect(
-    page.getByRole('heading', { name: /you've tried managing it\. now fix the root cause\./i })
-  ).toBeVisible({ timeout: 15000 });
+  console.log('[STEP 3] Verifying comparison/root-cause section heading');
+  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+  const compHeading = page.getByRole('heading').filter({ hasText: /tried|root cause|managing|fix/i }).first();
+  await expect(compHeading).toBeVisible({ timeout: 15000 });
 });

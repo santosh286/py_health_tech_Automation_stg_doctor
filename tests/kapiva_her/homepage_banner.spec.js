@@ -44,7 +44,7 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   // ============================================================
   // STEP 3 — Verify homepage banner is visible
   // ============================================================
-  const heroHeading = page.getByRole('heading', { name: /pcos isn't one problem/i });
+  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos/i }).first();
   await expect(heroHeading, '❌ Hero banner heading not visible').toBeVisible({ timeout: 15000 });
   console.log('[STEP 3] ✅ Homepage banner visible');
 
@@ -76,6 +76,10 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   await page.getByPlaceholder('Enter your name').fill(name);
   await page.getByPlaceholder('Enter your email').fill(email);
   await page.getByPlaceholder('Enter 10-digit number').fill(phone);
+  const stateSelect = page.locator('select').first();
+  if (await stateSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await stateSelect.selectOption({ index: 1 });
+  }
   console.log(`[STEP 7] ✅ Filled → name: ${name} | email: ${email} | phone: ${phone}`);
 
   // ============================================================

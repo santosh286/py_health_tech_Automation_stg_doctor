@@ -15,25 +15,36 @@ test.afterEach(async ({ page }, testInfo) => {
 test('Booking slot selection — Step 2/3', async ({ page }) => {
   test.setTimeout(120000);
 
+  const ts = Date.now();
+  const name  = `Test User${ts.toString().slice(-4)}`;
+  const email = `testuser${ts}@kapiva.test`;
+  const phone = `9${ts.toString().slice(-9)}`;
+
   // STEP 1 — Navigate to /booking and fill valid details
   await page.goto(`${BASE_URL}booking`, { waitUntil: 'domcontentloaded', timeout: 30000 });
   console.log('[STEP 1] Navigated to /booking');
 
   // STEP 2 — Fill valid details
   await expect(page.getByText('Fill your Details'), '"Fill your Details" not visible').toBeVisible({ timeout: 15000 });
-  await page.getByPlaceholder('Enter your name').fill('Test User');
-  await page.getByPlaceholder('Enter your email').fill('test@kapiva.test');
-  await page.getByPlaceholder('Enter 10-digit number').fill('9876543210');
-  console.log('[STEP 2] Filled: name="Test User", email="test@kapiva.test", phone="9876543210"');
+  await page.getByPlaceholder('Enter your name').fill(name);
+  await page.getByPlaceholder('Enter your email').fill(email);
+  await page.getByPlaceholder('Enter 10-digit number').fill(phone);
+  const stateSelect = page.locator('select').first();
+  if (await stateSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await stateSelect.selectOption({ index: 1 });
+  }
+  console.log(`[STEP 2] Filled: name="${name}", email="${email}", phone="${phone}"`);
 
   // STEP 3 — Click Next to go to Step 2
   const nextBtn = page.getByRole('button', { name: 'Next', exact: true });
+  await nextBtn.scrollIntoViewIfNeeded();
   await expect(nextBtn, 'Next button should be enabled').toBeEnabled({ timeout: 10000 });
   await nextBtn.click();
   console.log('[STEP 3] Clicked Next');
 
-  // STEP 4 — Verify "Select your slot" heading visible (Step 2/3)
-  await expect(page.getByText('Select your slot'), '"Select your slot" heading not visible').toBeVisible({ timeout: 15000 });
+  // STEP 4 — Verify slot selection page visible (Step 2/3)
+  // Page header says "Select your slot"; section heading says "Select a slot"
+  await expect(page.getByText(/select.*slot/i).first(), 'Slot selection page not visible').toBeVisible({ timeout: 15000 });
   console.log('[STEP 4] "Select your slot" heading visible (Step 2/3)');
 
   // STEP 5 — Verify date picker shows at least 1 date button

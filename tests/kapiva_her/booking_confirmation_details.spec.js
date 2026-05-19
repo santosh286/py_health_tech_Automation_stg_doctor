@@ -29,16 +29,21 @@ test('Booking confirmation details — full booking flow', async ({ page }) => {
   await page.getByPlaceholder('Enter your name').fill(name);
   await page.getByPlaceholder('Enter your email').fill(email);
   await page.getByPlaceholder('Enter 10-digit number').fill(phone);
+  const stateSelect = page.locator('select').first();
+  if (await stateSelect.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await stateSelect.selectOption({ index: 1 });
+  }
   console.log(`[STEP 2] Filled details: name="${name}", email="${email}", phone="${phone}"`);
 
   // STEP 3 — Click Next (Step 1 -> Step 2)
   const nextBtn1 = page.getByRole('button', { name: 'Next', exact: true });
+  await nextBtn1.scrollIntoViewIfNeeded();
   await expect(nextBtn1).toBeEnabled({ timeout: 10000 });
   await nextBtn1.click();
   console.log('[STEP 3] Clicked Next (Step 1 -> Step 2)');
 
   // STEP 4 — Select first time slot
-  await expect(page.getByText('Select your slot')).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(/select.*slot/i).first()).toBeVisible({ timeout: 15000 });
   const firstSlot = page.locator('button').filter({ hasText: /\d{1,2}:\d{2}(am|pm)/i }).first();
   await expect(firstSlot).toBeVisible({ timeout: 15000 });
   const slotText = await firstSlot.innerText();
