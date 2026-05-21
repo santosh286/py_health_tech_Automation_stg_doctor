@@ -55,13 +55,14 @@ Playwright-based end-to-end test automation suite for the Kapiva HealthTech plat
     │   └── roles.spec.js             # 7 tests — roles CRUD & access control
     ├── teams/
     │   └── teams.spec.js             # 9 tests — teams CRUD, members & access control
-    ├── kapiva_her/                    # Kapiva HER landing page & booking (JS specs)
+    ├── kapiva_her/                    # Kapiva HER landing page & booking (21 JS specs)
     │   ├── booking_confirmation_details.spec.js
     │   ├── booking_form_validation.spec.js
     │   ├── booking_invalid_email.spec.js
     │   ├── booking_invalid_phone.spec.js
     │   ├── booking_slot_selection.spec.js
     │   ├── booking_via_doctor_card.spec.js
+    │   ├── consult_now_booking.spec.js
     │   ├── homepage_banner.spec.js
     │   ├── landing_page_comparison.spec.js
     │   ├── landing_page_doctors.spec.js
@@ -138,7 +139,9 @@ npm run test:my-profile
 npm run test:roles
 npm run test:teams
 npm run test:doctor
-npm run test:kapiva-her
+npm run test:kapiva-her          # Full kapiva_her suite (21 specs, serial)
+npm run test:kapiva-her:ui       # Landing pages + form validation only (fast)
+npm run test:kapiva-her:booking  # Booking flows + quiz (API-dependent)
 npm run test:omnicare
 
 # Run a specific spec file
@@ -264,30 +267,33 @@ npm run allure:report
 | TC_094 | Teams page handles API error gracefully |
 | TC_095 | Unauthenticated access to /teams redirects to login |
 
-### Kapiva HER (`kapiva_her/`) — 20 specs
+### Kapiva HER (`kapiva_her/`) — 21 specs
+
+All specs run on **Pixel 7 mobile emulation** against `https://staging.kapivaher.com/`.
 
 | Spec | Description |
 |---|---|
-| `landing_page_hero` | Hero section renders correctly |
-| `landing_page_doctors` | Doctors section on landing page |
-| `landing_page_faq` | FAQ section expand/collapse |
+| `landing_page_hero` | Hero section heading, stats badges, CTA button |
+| `landing_page_doctors` | Doctors section heading and Consult Now link |
+| `landing_page_faq` | FAQ accordion expand/collapse |
 | `landing_page_howitworks` | How it works section |
-| `landing_page_symptoms` | Symptoms section |
-| `landing_page_sticky_cta` | Sticky CTA visibility on scroll |
-| `landing_page_comparison` | Comparison section |
-| `landing_page_no_infertility` | No infertility section |
-| `homepage_banner` | Homepage banner display |
-| `booking_via_doctor_card` | Booking initiated via doctor card |
-| `booking_slot_selection` | Slot selection flow |
-| `booking_form_validation` | Form field validations |
-| `booking_invalid_email` | Invalid email shows error |
-| `booking_invalid_phone` | Invalid phone shows error |
-| `booking_confirmation_details` | Booking confirmation details |
-| `quiz_q13_skip` | Quiz Q13 skip behaviour |
-| `quiz_without_booking` | Quiz flow without booking |
-| `shantavri_con_booking` | Shantavri consultation booking |
-| `shop_now_click` | Shop Now CTA click |
-| `utm_attribution` | UTM parameter attribution |
+| `landing_page_symptoms` | PCOS symptoms section content |
+| `landing_page_sticky_cta` | Sticky CTA bar visibility on scroll |
+| `landing_page_comparison` | Root-cause comparison section |
+| `landing_page_no_infertility` | Infertility tile removed, Mood & Motivation added |
+| `homepage_banner` | Homepage banner → booking → confirmation |
+| `booking_via_doctor_card` | Booking via doctor card Consult Now link |
+| `booking_slot_selection` | Slot selection Step 2/3 flow |
+| `booking_form_validation` | Next button disabled until all fields filled |
+| `booking_invalid_email` | Invalid email keeps Next disabled |
+| `booking_invalid_phone` | Invalid phone keeps Next disabled |
+| `booking_confirmation_details` | Full booking → confirmation details |
+| `consult_now_booking` | Doctor card → booking → quiz → result (full E2E) |
+| `shantavri_con_booking` | Shantavri consultation booking + quiz |
+| `quiz_q13_skip` | Quiz Q13 skippable (Next enabled without selection) |
+| `quiz_without_booking` | Quiz flow accessible without prior booking |
+| `shop_now_click` | Shop Now CTA click and navigation |
+| `utm_attribution` | UTM params preserved in Shop Products link |
 
 ### OmniCare Flow (`mobile_concern.spec.js`)
 
@@ -315,8 +321,9 @@ End-to-end guest user journey on `staging.kapiva.in`:
 |---|---|
 | Base URL (HTS) | `https://stg-hts.kapiva.tech/` |
 | Base URL (Staging) | `https://staging.kapiva.in/` |
-| Browser | Chromium (headless) |
-| Retries | 2 (on failure) |
+| Base URL (Kapiva HER) | `https://staging.kapivaher.com/` |
+| Browser | Real Chrome (stealth mode — bypasses Cloudflare bot checks) |
+| Retries | 2 on CI / 1 locally (auto-retry flaky staging tests) |
 | Reporters | HTML + Allure |
 | Allure History | Persisted across runs |
 | Environment | Staging |
