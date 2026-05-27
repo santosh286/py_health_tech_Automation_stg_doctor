@@ -22,7 +22,7 @@ test('How it works — PCOSolve plan heading and step images', async ({ page }) 
 
   console.log('[STEP 3] Verifying PCOSolve/How it works section heading');
   await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-  const howItWorksHeading = page.getByRole('heading').filter({ hasText: /pcosolve|how we fix|personalized plan|holistic plan|fix it/i }).first();
+  const howItWorksHeading = page.getByRole('heading').filter({ hasText: /pcosolve|pmosolve|how we fix|personalized plan|holistic plan|fix it/i }).first();
   await expect(howItWorksHeading).toBeVisible({ timeout: 15000 });
 
   console.log('[STEP 4] Verifying section has images/steps');

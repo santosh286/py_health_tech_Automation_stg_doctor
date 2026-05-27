@@ -21,9 +21,9 @@ test('Hero section — headings, trust badges, CTA link', async ({ page }) => {
   console.log('[STEP 2] Verifying URL contains staging.kapivaher.com');
   expect(page.url()).toContain('staging.kapivaher.com');
 
-  console.log('[STEP 3] Verifying hero heading contains PCOS content');
+  console.log('[STEP 3] Verifying hero heading contains PCOS/PMOS content');
   await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos/i }).first();
+  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos|pmos/i }).first();
   await expect(heroHeading).toBeVisible({ timeout: 15000 });
 
   console.log('[STEP 4] Verifying 82% stat badge');

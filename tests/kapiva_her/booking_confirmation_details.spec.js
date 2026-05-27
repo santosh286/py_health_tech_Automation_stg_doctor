@@ -91,7 +91,7 @@ test('Booking confirmation details — full booking flow', async ({ page }) => {
   console.log('[STEP 11] Date/time visible on confirmation page');
 
   // STEP 12 — Verify PCOSolve Quiz section visible (replaces old "ONE MORE STEP" section)
-  await expect(page.getByText(/PCOSolve Quiz|Help us know you better/i).first(), 'Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(/PCOSolve Quiz|PMOSolve Quiz|Help us know you better/i).first(), 'Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
   console.log('[STEP 12] PCOSolve Quiz prompt section visible');
 
   // STEP 13 — Verify "Start Your Assessment" link visible

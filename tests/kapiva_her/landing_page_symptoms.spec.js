@@ -21,14 +21,14 @@ test('Symptoms section — tiles and section heading', async ({ page }) => {
   await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
 
   // The section heading or nearby text describing PCOS symptoms
-  const symptomsSection = page.getByText(/hormonal imbalance|different symptoms|pcos doesn't start|symptoms/i).first();
+  const symptomsSection = page.getByText(/hormonal imbalance|different symptoms|pcos doesn't start|pmos doesn't start|symptoms/i).first();
   await expect(symptomsSection).toBeVisible({ timeout: 15000 });
   console.log('[STEP 2] ✅ Symptoms/Hormonal Imbalance section visible');
 
-  console.log('[STEP 3] Verifying PCOS-related content is visible on page');
-  const pcosContent = page.getByText(/pcos/i).first();
+  console.log('[STEP 3] Verifying PCOS/PMOS-related content is visible on page');
+  const pcosContent = page.getByText(/pcos|pmos/i).first();
   await expect(pcosContent).toBeVisible({ timeout: 10000 });
-  console.log('[STEP 3] ✅ PCOS content visible');
+  console.log('[STEP 3] ✅ PCOS/PMOS content visible');
 
   console.log('[STEP 4] Verifying page has symptom or condition content');
   const bodyText = await page.evaluate(() => document.body.innerText);

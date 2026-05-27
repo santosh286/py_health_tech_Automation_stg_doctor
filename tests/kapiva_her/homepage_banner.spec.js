@@ -44,7 +44,7 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   // ============================================================
   // STEP 3 — Verify homepage banner is visible
   // ============================================================
-  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos/i }).first();
+  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos|pmos/i }).first();
   await expect(heroHeading, '❌ Hero banner heading not visible').toBeVisible({ timeout: 15000 });
   console.log('[STEP 3] ✅ Homepage banner visible');
 

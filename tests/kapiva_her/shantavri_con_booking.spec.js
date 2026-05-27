@@ -46,7 +46,7 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   // ============================================================
   // STEP 3 — Verify homepage banner is visible
   // ============================================================
-  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos/i }).first();
+  const heroHeading = page.getByRole('heading').filter({ hasText: /pcos|pmos/i }).first();
   await expect(heroHeading, '❌ Hero banner heading not visible').toBeVisible({ timeout: 15000 });
   console.log('[STEP 3] ✅ Homepage banner visible');
 
@@ -161,7 +161,7 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   // ============================================================
   // STEP 14 — Verify PCOSolve Quiz section + Start Your Assessment
   // ============================================================
-  await expect(page.getByText(/PCOSolve Quiz|Help us know you better/i).first(), '❌ Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(/PCOSolve Quiz|PMOSolve Quiz|Help us know you better/i).first(), '❌ Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
   const startAssessmentBtn = page.getByRole('link', { name: /start your assessment/i });
   await startAssessmentBtn.scrollIntoViewIfNeeded();
   await expect(startAssessmentBtn, '❌ Start Your Assessment not visible').toBeVisible({ timeout: 10000 });
@@ -172,9 +172,9 @@ test('Shantavri Consultation Booking Flow — kapivaher (412×815)', async ({ pa
   // STEP 15 — Verify quiz page loaded (Step 1/13)
   // ============================================================
   await page.waitForURL(/\/quiz/, { timeout: 15000 });
-  await expect(page.getByText('PCOS Assessment Form'), '❌ Quiz title not visible').toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(/PCOS Assessment Form|PMOS Assessment Form/i), '❌ Quiz title not visible').toBeVisible({ timeout: 15000 });
   await expect(page.getByText('Step 1'), '❌ Quiz Step 1 indicator not visible').toBeVisible({ timeout: 10000 });
-  console.log('[STEP 15] ✅ PCOS Assessment Form loaded — Step 1/13');
+  console.log('[STEP 15] ✅ Assessment Form loaded — Step 1');
 
   // ============================================================
   // Quiz helper — picks first visible option, handles Next/Submit

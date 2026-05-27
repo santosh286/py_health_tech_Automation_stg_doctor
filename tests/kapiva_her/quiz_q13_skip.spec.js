@@ -82,8 +82,8 @@ test('Quiz Q13 — skippable (Next/Submit enabled without selection)', async ({ 
 
   // STEP 7 — Wait for quiz page
   await page.waitForURL(/\/quiz/, { timeout: 15000 });
-  await expect(page.getByText('PCOS Assessment Form')).toBeVisible({ timeout: 15000 });
-  console.log('[STEP 7] Quiz loaded — PCOS Assessment Form');
+  await expect(page.getByText(/PCOS Assessment Form|PMOS Assessment Form/i)).toBeVisible({ timeout: 15000 });
+  console.log('[STEP 7] Quiz loaded — Assessment Form');
 
   // Helper: click first quiz option and then Next/Submit
   const EXCLUDED = /^(next|back|skip|preparing|loading|generating|download|submit|book|consult|start|shop)/i;

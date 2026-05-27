@@ -154,7 +154,7 @@ test('Consult Now Booking — Doctor Card on kapivaher landing page (Pixel 7)', 
   // ============================================================
   // STEP 11 — Verify PCOSolve Quiz section + click "Start Your Assessment"
   // ============================================================
-  await expect(page.getByText(/PCOSolve Quiz|Help us know you better/i).first(), '❌ Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
+  await expect(page.getByText(/PCOSolve Quiz|PMOSolve Quiz|Help us know you better/i).first(), '❌ Quiz prompt section not visible').toBeVisible({ timeout: 10000 });
   const startAssessmentBtn = page.getByRole('link', { name: /start your assessment/i });
   await startAssessmentBtn.scrollIntoViewIfNeeded();
   await expect(startAssessmentBtn, '❌ "Start Your Assessment" not visible').toBeVisible({ timeout: 10000 });
@@ -165,9 +165,9 @@ test('Consult Now Booking — Doctor Card on kapivaher landing page (Pixel 7)', 
   // STEP 12 — Verify quiz page loaded (Step 1/13)
   // ============================================================
   await page.waitForURL(/\/quiz/, { timeout: 15000 });
-  await expect(page.getByText('PCOS Assessment Form'), '❌ Quiz title not visible').toBeVisible({ timeout: 15000 });
+  await expect(page.getByText(/PCOS Assessment Form|PMOS Assessment Form/i), '❌ Quiz title not visible').toBeVisible({ timeout: 15000 });
   await expect(page.getByText('Step 1'), '❌ Quiz Step 1 indicator not visible').toBeVisible({ timeout: 10000 });
-  console.log('[STEP 12] ✅ PCOS Assessment Form loaded — Step 1/13');
+  console.log('[STEP 12] ✅ Assessment Form loaded — Step 1');
 
   // ============================================================
   // Helpers for radio (single select) and checkbox (multi select) questions

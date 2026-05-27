@@ -21,14 +21,14 @@ test('Symptom tiles — Infertility tile removed, Mood & Motivation added', asyn
 
   console.log('[STEP 2] Verifying symptoms/PCOS section content present');
   await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-  const pcosSection = page.getByText(/hormonal imbalance|pcos doesn't start|different symptoms|pcos/i).first();
+  const pcosSection = page.getByText(/hormonal imbalance|pcos doesn't start|pmos doesn't start|different symptoms|pcos|pmos/i).first();
   await expect(pcosSection).toBeVisible({ timeout: 15000 });
 
-  console.log('[STEP 3] Verifying PCOS-related content on page');
+  console.log('[STEP 3] Verifying PCOS/PMOS-related content on page');
   const bodyText = await page.evaluate(() => document.body.innerText);
-  const hasSymptomContent = /acne|irregular|weight|mood|bleeding|hair|hormonal|pcos/i.test(bodyText);
-  expect(hasSymptomContent, '❌ No PCOS symptom-related content on page').toBe(true);
-  console.log('[STEP 3] ✅ PCOS/symptom content found on page');
+  const hasSymptomContent = /acne|irregular|weight|mood|bleeding|hair|hormonal|pcos|pmos/i.test(bodyText);
+  expect(hasSymptomContent, '❌ No PCOS/PMOS symptom-related content on page').toBe(true);
+  console.log('[STEP 3] ✅ PCOS/PMOS/symptom content found on page');
 
   console.log('[STEP 4] Verifying Infertility is NOT a standalone symptom heading tile');
   const infertilityTile = page.getByRole('heading', { name: /^infertility$/i });
