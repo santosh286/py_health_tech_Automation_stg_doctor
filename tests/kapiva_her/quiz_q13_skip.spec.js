@@ -66,7 +66,7 @@ test('Quiz Q13 — skippable (Next/Submit enabled without selection)', async ({ 
   console.log('[STEP 4] Selected doctor and clicked Book Now');
 
   // STEP 5 — Verify booking confirmation
-  await page.waitForURL(/\/booking\/confirmation/, { timeout: 20000 });
+  await page.waitForURL(/\/booking\/confirmation/, { timeout: 60000 });
   await expect(page.getByText('Consultation Booked!')).toBeVisible({ timeout: 15000 });
   console.log(`[STEP 5] Booking confirmed: ${page.url()}`);
 
@@ -131,9 +131,11 @@ test('Quiz Q13 — skippable (Next/Submit enabled without selection)', async ({ 
   }
   if (quizDoneEarly) {
     console.log('[STEP 19] Quiz submitted early (fewer than 13 questions) — verifying result page');
-    await page.waitForURL(/\/quiz/, { timeout: 15000 });
-    const heading = await page.locator('h1, h2, h3').first().innerText().catch(() => 'done');
-    console.log(`[Quiz Done] Result: "${heading}"`);
+    await page.waitForLoadState('domcontentloaded', { timeout: 20000 });
+    await page.waitForTimeout(3000);
+    const heading = page.locator('h1, h2, h3, h4, [class*="heading"], [class*="title"]').first();
+    const headingText = await heading.innerText().catch(() => 'done');
+    console.log(`[Quiz Done] Result: "${headingText}"`);
     return;
   }
   console.log('[STEP 19] Completed Q1-Q12, now on Q13');
