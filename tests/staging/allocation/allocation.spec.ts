@@ -9,10 +9,10 @@ test.describe('Allocation Dashboard — /allocation', () => {
   test.beforeEach(async ({ page }) => {
     // Login as Admin
     await page.goto(`${BASE_URL}/login`, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.getByPlaceholder(/email/i).fill(usersData.admin.email);
-    await page.getByPlaceholder(/password/i).fill(usersData.admin.password);
-    await page.getByRole('button', { name: /login|sign in/i }).click();
-    await page.waitForURL(/\/(dashboard|appointments)/, { timeout: 20000 });
+    await page.fill('#email', usersData.users[2].email);
+    await page.fill('#password', usersData.users[2].password);
+    await page.locator('button[type="submit"]').click();
+    await page.waitForURL(/\/(dashboard|appointments|doctors-list)/, { timeout: 30000 });
     console.log('[Login] Admin logged in:', page.url());
   });
 

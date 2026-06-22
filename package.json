@@ -26,7 +26,9 @@
     "test:kapiva-her:ui": "npx playwright test tests/kapiva_her/landing_page_* tests/kapiva_her/booking_form_* tests/kapiva_her/booking_invalid_* tests/kapiva_her/landing_page_sticky_cta* tests/kapiva_her/shop_now* tests/kapiva_her/utm_* --workers=1",
     "test:kapiva-her:booking": "npx playwright test tests/kapiva_her/booking_confirmation* tests/kapiva_her/booking_slot* tests/kapiva_her/booking_via* tests/kapiva_her/shantavri* tests/kapiva_her/consult_now* tests/kapiva_her/homepage_banner* tests/kapiva_her/quiz* --workers=1",
     "test:omnicare": "npx playwright test tests/omnicare_flow/",
-    "test:allocation": "npx playwright test tests/allocation/"
+    "test:allocation": "npx playwright test tests/allocation/",
+    "test:post-call-analytics": "npx playwright test tests/post-call-analytics/",
+    "test:quiz-templates": "npx playwright test tests/quiz-templates/"
   },
   "keywords": [],
   "author": "",
