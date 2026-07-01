@@ -7,7 +7,7 @@ import {
   LOGIN_SUCCESS_RESPONSE,
   LOGIN_INVALID_CREDENTIALS_RESPONSE,
   REFRESH_TOKEN_SUCCESS_RESPONSE,
-} from "../../fixtures/mockData";
+} from "../../../../fixtures/mockData";
 
 const AUTH_BASE =
   "https://kapiva-auth-service-stg-170267861398.asia-south1.run.app/auth-service/api/v1";
@@ -176,12 +176,12 @@ test("4. Logout clears tokens and redirects to login", async ({ page }) => {
   await expect(page).toHaveURL("/dashboard", { timeout: 8000 });
   console.log("[4] ✓ User is on dashboard (logged in)");
 
-  console.log("[4] Hovering over profile avatar to reveal logout button");
-  const profileAvatar = page.locator(".group");
-  await profileAvatar.hover();
+  console.log("[4] Clicking profile avatar to reveal logout dropdown");
+  const profileAvatar = page.locator("div[role='button']").filter({ has: page.locator("img[alt]") }).last();
+  await profileAvatar.click();
 
   const logoutButton = page.locator("button", { hasText: "Logout" });
-  await expect(logoutButton).toBeVisible({ timeout: 3000 });
+  await expect(logoutButton).toBeVisible({ timeout: 5000 });
   console.log("[4] Clicking logout button");
   await logoutButton.click();
 
@@ -292,7 +292,7 @@ test("10. Google SSO (Gmail) login button is visible on login page", async ({ pa
   await page.goto("/");
 
   console.log("[10] Checking Gmail SSO button is visible");
-  const gmailBtn = page.getByRole("button", { name: /login with gmail|gmail.*sso/i });
+  const gmailBtn = page.locator("button", { hasText: /sign in with google/i });
   await expect(gmailBtn).toBeVisible({ timeout: 5000 });
   console.log("[10] ✓ Gmail SSO button is visible");
 });
@@ -307,7 +307,7 @@ test("10b. Google SSO button click redirects to Google auth URL", async ({ page 
   });
 
   console.log("[10b] Intercepting navigation on Gmail SSO click");
-  const gmailBtn = page.getByRole("button", { name: /login with gmail|gmail.*sso/i });
+  const gmailBtn = page.locator("button", { hasText: /sign in with google/i });
   await expect(gmailBtn).toBeVisible({ timeout: 5000 });
 
   await Promise.race([
@@ -332,7 +332,7 @@ test("11. Microsoft SSO login button is visible on login page", async ({ page })
   await page.goto("/");
 
   console.log("[11] Checking Microsoft SSO button is visible");
-  const msBtn = page.getByRole("button", { name: /microsoft|login with microsoft|ms.*sso/i });
+  const msBtn = page.locator("button", { hasText: /sign in with microsoft/i });
   const msBtnVisible = await msBtn.isVisible({ timeout: 5000 }).catch(() => false);
 
   if (msBtnVisible) {
@@ -347,7 +347,7 @@ test("11b. Microsoft SSO button click redirects to Microsoft auth URL", async ({
   console.log("[11b] Navigating to login page");
   await page.goto("/");
 
-  const msBtn = page.getByRole("button", { name: /microsoft|login with microsoft|ms.*sso/i });
+  const msBtn = page.locator("button", { hasText: /sign in with microsoft/i });
   const msBtnVisible = await msBtn.isVisible({ timeout: 5000 }).catch(() => false);
   if (!msBtnVisible) {
     console.log("[11b] ℹ️ Microsoft SSO button not found — skipping");
