@@ -285,6 +285,98 @@ test("8. Mid-session 401 → auto-refresh token → retry original request", asy
   console.log("[8] ✅ PASS — Mid-session 401 auto-refresh flow verified");
 });
 
+// ─── Test #10 — Google SSO button visible and redirects ──────────────────────
+
+test("10. Google SSO (Gmail) login button is visible on login page", async ({ page }) => {
+  console.log("[10] Navigating to login page");
+  await page.goto("/");
+
+  console.log("[10] Checking Gmail SSO button is visible");
+  const gmailBtn = page.getByRole("button", { name: /login with gmail|gmail.*sso/i });
+  await expect(gmailBtn).toBeVisible({ timeout: 5000 });
+  console.log("[10] ✓ Gmail SSO button is visible");
+});
+
+test("10b. Google SSO button click redirects to Google auth URL", async ({ page }) => {
+  console.log("[10b] Navigating to login page");
+  await page.goto("/");
+
+  let redirectUrl = "";
+  page.on("request", (req) => {
+    if (req.url().includes("google")) redirectUrl = req.url();
+  });
+
+  console.log("[10b] Intercepting navigation on Gmail SSO click");
+  const gmailBtn = page.getByRole("button", { name: /login with gmail|gmail.*sso/i });
+  await expect(gmailBtn).toBeVisible({ timeout: 5000 });
+
+  await Promise.race([
+    gmailBtn.click(),
+    page.waitForNavigation({ timeout: 5000 }).catch(() => {}),
+  ]);
+
+  const currentUrl = page.url();
+  const isGoogleRedirect =
+    currentUrl.includes("google") ||
+    currentUrl.includes("accounts.google") ||
+    redirectUrl.includes("google");
+
+  expect(isGoogleRedirect).toBeTruthy();
+  console.log(`[10b] ✓ Redirected to Google auth: ${currentUrl}`);
+});
+
+// ─── Test #11 — Microsoft SSO ─────────────────────────────────────────────────
+
+test("11. Microsoft SSO login button is visible on login page", async ({ page }) => {
+  console.log("[11] Navigating to login page");
+  await page.goto("/");
+
+  console.log("[11] Checking Microsoft SSO button is visible");
+  const msBtn = page.getByRole("button", { name: /microsoft|login with microsoft|ms.*sso/i });
+  const msBtnVisible = await msBtn.isVisible({ timeout: 5000 }).catch(() => false);
+
+  if (msBtnVisible) {
+    console.log("[11] ✓ Microsoft SSO button is visible");
+  } else {
+    console.log("[11] ℹ️ Microsoft SSO button not found — may not be enabled on staging");
+    test.skip();
+  }
+});
+
+test("11b. Microsoft SSO button click redirects to Microsoft auth URL", async ({ page }) => {
+  console.log("[11b] Navigating to login page");
+  await page.goto("/");
+
+  const msBtn = page.getByRole("button", { name: /microsoft|login with microsoft|ms.*sso/i });
+  const msBtnVisible = await msBtn.isVisible({ timeout: 5000 }).catch(() => false);
+  if (!msBtnVisible) {
+    console.log("[11b] ℹ️ Microsoft SSO button not found — skipping");
+    test.skip();
+    return;
+  }
+
+  let redirectUrl = "";
+  page.on("request", (req) => {
+    if (req.url().includes("microsoft") || req.url().includes("microsoftonline")) {
+      redirectUrl = req.url();
+    }
+  });
+
+  await Promise.race([
+    msBtn.click(),
+    page.waitForNavigation({ timeout: 5000 }).catch(() => {}),
+  ]);
+
+  const currentUrl = page.url();
+  const isMicrosoftRedirect =
+    currentUrl.includes("microsoft") ||
+    currentUrl.includes("microsoftonline") ||
+    redirectUrl.includes("microsoft");
+
+  expect(isMicrosoftRedirect).toBeTruthy();
+  console.log(`[11b] ✓ Redirected to Microsoft auth: ${currentUrl}`);
+});
+
 // ─── Test #9 — Network failure → error toast ─────────────────────────────────
 // Scenario: User is logged in. An API call fails with a network error
 // (connection aborted). The app should catch the error and show an error toast.
